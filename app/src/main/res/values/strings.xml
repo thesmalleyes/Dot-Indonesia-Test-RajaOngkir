@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">DOT-Test</string>
+    <string name="provinsi">Provinsi</string>
+    <string name="kota">Kota</string>
+    <string name="pilih_kota">Pilih Kota</string>
+    <string name="cek_harga">Cek Tarif</string>
+    <string name="pilih_provinsi">pilih provinsi</string>
+    <string name="masukkan_alamat">Masukkan Alamat Asal Pengiriman</string>
+    <string name="masukkan_tujuan">Masukkan Alamat Tujuan Pengiriman</string>
+    <string name="ubah">Ubah</string>
+    <string name="cek_tarif">Cek Tarif</string>
+    <string name="berat_barang">Masukkan Berat Barang :</string>
+    <string name="kg">Kg</string>
+    <string name="pilih_kurir">Pilih Kurir</string>
+    <string name="jne">JNE</string>
+    <string name="pos">POS</string>
+    <string name="tiki">TIKI</string>
+    <string name="pilih">Pilih</string>
+    <string name="cari">Cari</string>
+    <string name="batal">Batal</string>
+    <string name="pilihan">Pilihan</string>
+</resources>
