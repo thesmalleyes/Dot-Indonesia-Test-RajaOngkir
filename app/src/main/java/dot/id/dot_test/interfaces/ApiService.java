@@ -1,8 +1,8 @@
-package dot.id.dot_test;
+package dot.id.dot_test.interfaces;
 
-import dot.id.dot_test.Model.CityResponse;
-import dot.id.dot_test.Model.CostResponse;
-import dot.id.dot_test.Model.ProvinceResponse;
+import dot.id.dot_test.model.CityResponse;
+import dot.id.dot_test.model.CostResponse;
+import dot.id.dot_test.model.ProvinceResponse;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;

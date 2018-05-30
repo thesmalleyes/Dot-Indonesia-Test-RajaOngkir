@@ -1,4 +1,4 @@
-package dot.id.dot_test;
+package dot.id.dot_test.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import dot.id.dot_test.Model.ProvinceResult;
+import dot.id.dot_test.interfaces.ClickListener;
+import dot.id.dot_test.model.ProvinceResult;
+import dot.id.dot_test.R;
 
 public class ProvinceAdapter extends RecyclerView.Adapter<ProvinceAdapter.ViewHolder> {
     private List<ProvinceResult> provinceResults;

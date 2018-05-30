@@ -1,7 +1,7 @@
-package dot.id.dot_test;
+package dot.id.dot_test.interfaces;
 
-import dot.id.dot_test.Model.CityResult;
-import dot.id.dot_test.Model.ProvinceResult;
+import dot.id.dot_test.model.CityResult;
+import dot.id.dot_test.model.ProvinceResult;
 
 public interface ClickListener {
     void onProvinceItemClick(ProvinceResult provinceResult);

@@ -1,4 +1,4 @@
-package dot.id.dot_test.Model;
+package dot.id.dot_test.model;
 
 import com.google.gson.annotations.SerializedName;
 

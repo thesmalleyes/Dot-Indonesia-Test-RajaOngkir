@@ -1,6 +1,7 @@
-package dot.id.dot_test;
+package dot.id.dot_test.activity;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,35 +20,41 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import dot.id.dot_test.Model.CityResponse;
-import dot.id.dot_test.Model.CityResult;
-import dot.id.dot_test.Model.ProvinceResponse;
-import dot.id.dot_test.Model.ProvinceResult;
+import dot.id.dot_test.BaseApps;
+import dot.id.dot_test.adapter.CityAdapter;
+import dot.id.dot_test.interfaces.ClickListener;
+import dot.id.dot_test.ConstantPref;
+import dot.id.dot_test.model.CityResponse;
+import dot.id.dot_test.model.CityResult;
+import dot.id.dot_test.model.ProvinceResponse;
+import dot.id.dot_test.model.ProvinceResult;
+import dot.id.dot_test.adapter.ProvinceAdapter;
+import dot.id.dot_test.R;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements ClickListener {
-    TextView tvProvinsiAsal, tvKotaAsal, tvProvinsiTujuan, tvKotaTujuan, tvUbahPAsal, tvUbahKAsal, tvUbahPTujuan, tvUbahKTujuan;
-    TextView tvKotaAsalOption, tvKotaTujuanOption;
-    RelativeLayout rlPAsal, rlKAsal, rlPTujuan, rlKTujuan;
-    EditText etBerat;
-    RadioButton rbJne, rbPos, rbTiki;
-    Button bCekTarif;
-    BottomSheetDialog bsdDialog;
-    SearchView searchView;
-    RadioGroup radioGroup;
-    List<ProvinceResult> provinceResults = new ArrayList<>();
-    List<ProvinceResult> provinceResultsCopy = new ArrayList<>();
-    List<CityResult> cityResults = new ArrayList<>();
-    List<CityResult> cityResultsCopy = new ArrayList<>();
-    CityAdapter cityAdapter = new CityAdapter(cityResultsCopy);
-    ProvinceAdapter provinceAdapter = new ProvinceAdapter(provinceResultsCopy);
-    int temporaryValue = 0;
-    String idProvinceAsal, idProvinceTujuan, idKotaAsal, idKotaTujuan;
-    String courier;
-    String token = "0df6d5bf733214af6c6644eb8717c92c";
-    RadioButton radioButton;
+    private TextView tvProvinsiAsal, tvKotaAsal, tvProvinsiTujuan, tvKotaTujuan, tvUbahPAsal, tvUbahKAsal, tvUbahPTujuan, tvUbahKTujuan;
+    private TextView tvKotaAsalOption, tvKotaTujuanOption;
+    private RelativeLayout rlPAsal, rlKAsal, rlPTujuan, rlKTujuan;
+    private EditText etBerat;
+    private Button bCekTarif;
+    private BottomSheetDialog bsdDialog;
+    private SearchView searchView;
+    private RadioGroup radioGroup;
+    private List<ProvinceResult> provinceResults = new ArrayList<>();
+    private List<ProvinceResult> provinceResultsCopy = new ArrayList<>();
+    private List<CityResult> cityResults = new ArrayList<>();
+    private List<CityResult> cityResultsCopy = new ArrayList<>();
+    private CityAdapter cityAdapter = new CityAdapter(cityResultsCopy);
+    private ProvinceAdapter provinceAdapter = new ProvinceAdapter(provinceResultsCopy);
+    private int temporaryValue = 0;
+    private String idKotaAsal;
+    private String idKotaTujuan;
+    private String courier;
+    private String token = "0df6d5bf733214af6c6644eb8717c92c";
+    private RadioButton radioButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
             public void onClick(View view) {
                 if (radioGroup.getCheckedRadioButtonId() == -1)
                 {
-                    Toast.makeText(MainActivity.this, "Silahkan pilih salah satu kurir", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, ConstantPref.ERROR_COURIER, Toast.LENGTH_LONG).show();
                 }
                 else
                 {
@@ -132,14 +139,15 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
                     radioButton = findViewById(selectedId);
                     courier = radioButton.getText().toString();
                     String weight = etBerat.getText().toString();
+                    double conbvertToGram = Double.parseDouble(weight)*1000;
                     if (weight.matches("")){
-                        Toast.makeText(MainActivity.this, "Silahkan masukkan berat barang", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, ConstantPref.ERROR_WEIGHT, Toast.LENGTH_LONG).show();
                     } else {
                         Intent intent = new Intent(MainActivity.this, CostActivity.class);
                         intent.putExtra(ConstantPref.TOKEN, token);
                         intent.putExtra(ConstantPref.ORIGIN, idKotaAsal);
                         intent.putExtra(ConstantPref.DESTINATION, idKotaTujuan);
-                        intent.putExtra(ConstantPref.WEIGHT, weight);
+                        intent.putExtra(ConstantPref.WEIGHT, String.valueOf(conbvertToGram));
                         intent.putExtra(ConstantPref.COURIER, courier);
                         startActivity(intent);
                     }
@@ -165,9 +173,6 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
         rlKAsal = findViewById(R.id.rl_kota_asal);
         rlKTujuan = findViewById(R.id.rl_kota_tujuan);
         etBerat = findViewById(R.id.et_berat);
-        rbJne = findViewById(R.id.rb_jne);
-        rbPos = findViewById(R.id.rb_pos);
-        rbTiki = findViewById(R.id.rb_tiki);
         bCekTarif = findViewById(R.id.b_tarif);
         rlKAsal.setEnabled(false);
         tvKotaAsalOption.setTextColor(getResources().getColor(R.color.colorGrey));
@@ -178,19 +183,19 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
     public void getProvince(String token){
         BaseApps.getServices().getProvince(token).enqueue(new Callback<ProvinceResponse>() {
             @Override
-            public void onResponse(Call<ProvinceResponse> call, Response<ProvinceResponse> response) {
+            public void onResponse(@NonNull Call<ProvinceResponse> call, @NonNull Response<ProvinceResponse> response) {
                 if (response.isSuccessful()){
                     provinceResults.addAll(response.body().getRajaongkir().getResults());
                     provinceResultsCopy.addAll(response.body().getRajaongkir().getResults());
                     provinceAdapter.setClickListener(MainActivity.this);
                     provinceAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(MainActivity.this, "Periksa Koneksi Internet Anda", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, ConstantPref.ERROR_NOT_SUCCESS, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<ProvinceResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ProvinceResponse> call, Throwable t) {
 
             }
         });
@@ -199,14 +204,14 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
     public void getCity(String token, String id){
         BaseApps.getServices().getCity(token, id).enqueue(new Callback<CityResponse>() {
             @Override
-            public void onResponse(Call<CityResponse> call, Response<CityResponse> response) {
+            public void onResponse(@NonNull Call<CityResponse> call, Response<CityResponse> response) {
                 if (response.isSuccessful()){
                     cityResults.addAll(response.body().getRajaongkir().getResults());
                     cityResultsCopy.addAll(response.body().getRajaongkir().getResults());
                     cityAdapter.notifyDataSetChanged();
                     cityAdapter.setClickListener(MainActivity.this);
                 } else {
-                    Toast.makeText(MainActivity.this, "Periksa Koneksi Internet Anda", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, ConstantPref.ERROR_NOT_SUCCESS, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -241,7 +246,6 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
             }
         });
 
-        //Add list into Bottom Sheet
         RecyclerView rvPilihan = modalbottomsheet.findViewById(R.id.rv_pilihan);
         rvPilihan.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         if (code == 1 || code == 3){
@@ -302,9 +306,9 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
     public void onProvinceItemClick(ProvinceResult provinceResult) {
         bsdDialog.dismiss();
         if (temporaryValue == 1){
-            idProvinceAsal = provinceResult.getProvinceId();
+            String idProvinceAsal = provinceResult.getProvinceId();
             tvProvinsiAsal.setText(provinceResult.getProvince());
-            tvProvinsiAsal.setTextSize(18);
+            tvProvinsiAsal.setTextSize(ConstantPref.FONT_CHANGE);
             tvUbahPAsal.setVisibility(View.VISIBLE);
             tvUbahPAsal.setTextColor(getResources().getColor(R.color.colorPrimary));
             tvKotaAsalOption.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -313,9 +317,9 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
             cityResultsCopy.clear();
             getCity(token, idProvinceAsal);
         } else {
-            idProvinceTujuan = provinceResult.getProvinceId();
+            String idProvinceTujuan = provinceResult.getProvinceId();
             tvProvinsiTujuan.setText(provinceResult.getProvince());
-            tvProvinsiTujuan.setTextSize(18);
+            tvProvinsiTujuan.setTextSize(ConstantPref.FONT_CHANGE);
             tvUbahPTujuan.setVisibility(View.VISIBLE);
             rlPTujuan.setVisibility(View.GONE);
             rlKTujuan.setEnabled(true);
@@ -332,14 +336,14 @@ public class MainActivity extends AppCompatActivity implements ClickListener {
         if (temporaryValue == 2){
             idKotaAsal = cityResult.getCityId();
             tvKotaAsal.setText(cityResult.getCityName());
-            tvKotaAsal.setTextSize(18);
+            tvKotaAsal.setTextSize(ConstantPref.FONT_CHANGE);
             tvUbahKAsal.setVisibility(View.VISIBLE);
             rlKAsal.setVisibility(View.GONE);
             tvUbahKAsal.setTextColor(getResources().getColor(R.color.colorPrimary));
         } else {
             idKotaTujuan = cityResult.getCityId();
             tvKotaTujuan.setText(cityResult.getCityName());
-            tvKotaTujuan.setTextSize(18);
+            tvKotaTujuan.setTextSize(ConstantPref.FONT_CHANGE);
             tvUbahKTujuan.setVisibility(View.VISIBLE);
             rlKTujuan.setVisibility(View.GONE);
             tvUbahKTujuan.setTextColor(getResources().getColor(R.color.colorPrimary));

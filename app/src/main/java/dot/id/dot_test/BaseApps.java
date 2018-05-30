@@ -3,6 +3,7 @@ package dot.id.dot_test;
 import android.annotation.SuppressLint;
 import android.app.Application;
 
+import dot.id.dot_test.interfaces.ApiService;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
